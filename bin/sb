@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# skillbridge - The thin pipe orchestrator
+# This script routes commands to the appropriate module
+
+set -euo pipefail
+
+# Constants
+# Resolve the real script path even when invoked via a symlink
+_REAL_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")" 
+_REAL_BIN_DIR="$(cd "$(dirname "$_REAL_SCRIPT")" && pwd)"
+readonly SB_DIR="$(cd "${_REAL_BIN_DIR}/.." && pwd)"
+readonly VERSION="0.1.0"
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly NC='\033[0m'
+
+# Print usage information
+usage() {
+    cat <<EOF
+Skill Bridge (sb) v${VERSION}
+High-performance local context engine.
+
+Usage:
+  sb <command> [options]
+
+Commands:
+  init      Initialize the current workspace for Skill Bridge
+  context   Generate minified context (.sb-context.md) using QMD
+  design    Extract design tokens via jq
+  audit     Lightning-fast, regex-based code validator
+  skill     Manage skills (create, index)
+  uninstall Uninstall the Skill Bridge CLI
+  help      Show this help message
+EOF
+}
+
+# Main routing logic
+main() {
+    if [[ $# -eq 0 ]]; then
+        usage
+        exit 1
+    fi
+
+    local command="$1"
+    shift
+
+    case "$command" in
+        init)
+            exec "${SB_DIR}/src/onboarding/init.sh" "$@"
+            ;;
+        context)
+            exec "${SB_DIR}/src/modules/context.sh" "$@"
+            ;;
+        design)
+            exec "${SB_DIR}/src/modules/design.sh" "$@"
+            ;;
+        audit)
+            exec "${SB_DIR}/src/modules/audit.sh" "$@"
+            ;;
+        skill)
+            exec "${SB_DIR}/src/modules/skill.sh" "$@"
+            ;;
+        uninstall)
+            exec "${SB_DIR}/src/modules/uninstall.sh" "$@"
+            ;;
+        help|--help|-h)
+            usage
+            ;;
+        *)
+            echo -e "${RED}Error: Unknown command '$command'${NC}" >&2
+            usage
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

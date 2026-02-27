@@ -57,14 +57,47 @@ sb init
 
 ## 🛠️ Command Reference
 
-| Command | Description |
-| :--- | :--- |
-| `sb init` | Initialize the current workspace and check dependencies. |
-| `sb context` | Generate minified context (`.sb-context.md`) using QMD + jq. |
-| `sb design` | Instantly extract design tokens (colors, typography) via jq. |
-| `sb audit` | Lightning-fast, regex-based code validator. |
-| `sb skill` | Manage and index global/local AI skills. |
-| `sb uninstall` | Safely remove Skill Bridge from your system. |
+| Command        | Description                                                  |
+| :------------- | :----------------------------------------------------------- |
+| `sb init`      | Initialize the current workspace and check dependencies.     |
+| `sb context`   | Generate minified context (`.sb-context.md`) using QMD + jq. |
+| `sb design`    | Instantly extract design tokens (colors, typography) via jq. |
+| `sb audit`     | Lightning-fast, regex-based code validator.                  |
+| `sb skill`     | Manage and index global/local AI skills.                     |
+| `sb uninstall` | Safely remove Skill Bridge from your system.                 |
+
+---
+
+## ⌨️ IDE Integration
+
+Skill Bridge works as a background context provider for AI-native IDEs.
+
+### Using Slash Commands
+
+In your AI-enabled IDE (Cursor, VS Code with Google Antigravity, etc.), you can trigger Skill Bridge directly:
+
+- `@/context`: Fetch relevant semantic AI context.
+- `@/sb`: Run Skill Bridge CLI commands directly from the chat.
+- `@/design`: Extract design tokens into your current chat session.
+
+> [!TIP]
+> Always run `sb context "your task"` before a major implementation to ensure the agent has the exact fragments it needs.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Complete comprehensive documentation site.
+- [ ] Verify all markdown quality across skills.
+- [ ] Add 50+ new core development skills.
+- [ ] Populate `data/migrations/` with standardized JSON transformation maps.
+- [ ] Implement `sb upgrade` for seamless version management.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ---
 
@@ -81,6 +114,16 @@ sb init
 ## 📄 License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## ❤️ Acknowledgements
+
+Skill Bridge is powered by and draws inspiration from:
+
+- **[Antigravity Kit](https://github.com/vudovn/antigravity-kit)**: The foundational logic for agentic IDE integration.
+- **JQ**: The incredible JSON processor that makes our "Thin Pipe" possible.
+- **QMD**: For lightning-fast local Markdown RAG.
 
 ---
 

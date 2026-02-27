@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f5f3ff;
+  --color-primary-100: #ede9fe;
+  --color-primary-200: #ddd6fe;
+  --color-primary-300: #c4b5fd;
+  --color-primary-400: #a78bfa;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  --color-primary-700: #6d28d9;
+  --color-primary-800: #5b21b6;
+  --color-primary-900: #4c1d95;
+  --color-primary-950: #2e1065;
+}
+
+:root {
+	--sl-color-accent-low: #2e1065;
+	--sl-color-accent: #8b5cf6;
+	--sl-color-accent-high: #ddd6fe;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #f8fafc;
+	--sl-color-gray-2: #e2e8f0;
+	--sl-color-gray-3: #94a3b8;
+	--sl-color-gray-4: #475569;
+	--sl-color-gray-5: #1e293b;
+	--sl-color-gray-6: #0f172a;
+	--sl-color-black: #020617;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #ddd6fe;
+	--sl-color-accent: #8b5cf6;
+	--sl-color-accent-high: #2e1065;
+	--sl-color-white: #020617;
+	--sl-color-gray-1: #0f172a;
+	--sl-color-gray-2: #1e293b;
+	--sl-color-gray-3: #475569;
+	--sl-color-gray-4: #94a3b8;
+	--sl-color-gray-5: #e2e8f0;
+	--sl-color-gray-6: #f8fafc;
+	--sl-color-black: #ffffff;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+	background: rgba(255, 255, 255, 0.03);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+:root[data-theme='light'] .glass {
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Modern Typography */
+body {
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Starlight Overrides */
+.header {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+	background-color: rgba(15, 23, 42, 0.8) !important;
+	backdrop-filter: blur(8px) !important;
+}
+
+:root[data-theme='light'] .header {
+	background-color: rgba(255, 255, 255, 0.8) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+sidebar-variants {
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar-content {
+    background: transparent !important;
+}

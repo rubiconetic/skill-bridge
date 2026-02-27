@@ -1,0 +1,31 @@
+---
+import { Icon } from '@lucide/astro';
+
+interface Props {
+	title: string;
+	icon?: string;
+}
+
+const { title, icon } = Astro.props;
+---
+
+<div class="glass group relative overflow-hidden rounded-2xl p-8 transition-all duration-300 hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-500/10">
+	<div class="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+	
+	<div class="relative z-10">
+		{icon && (
+			<div class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:scale-110 transition-transform duration-300">
+				{icon === 'pencil' && <Icon name="edit-3" class="w-6 h-6" />}
+				{icon === 'magnifier' && <Icon name="search" class="w-6 h-6" />}
+				{icon === 'rocket' && <Icon name="rocket" class="w-6 h-6" />}
+				{icon === 'setting' && <Icon name="settings" class="w-6 h-6" />}
+			</div>
+		)}
+		<h3 class="text-xl font-bold text-white mb-3 group-hover:text-primary-100 transition-colors">
+			{title}
+		</h3>
+		<p class="text-gray-400 leading-relaxed">
+			<slot />
+		</p>
+	</div>
+</div>

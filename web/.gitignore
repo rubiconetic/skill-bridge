@@ -1,7 +1,3 @@
-.agent/
-docs/
-!web/src/content/docs/
-
 # build output
 dist/
 # generated types

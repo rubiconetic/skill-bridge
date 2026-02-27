@@ -1,0 +1,50 @@
+---
+title: Skill Bridge
+description: High-performance, token-efficient AI context injection.
+template: splash
+editUrl: false
+lastUpdated: false
+prev: false
+next: false
+hero:
+  tagline: Modern AI development requires a thinner context pipe.
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Get Started
+      link: /skill-bridge/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: CLI Reference
+      link: /skill-bridge/reference/cli/
+      icon: document
+---
+
+import ModernHero from '../../components/ModernHero.astro';
+import ModernCard from '../../components/ModernCard.astro';
+
+<ModernHero 
+  title="Skill Bridge"
+  tagline="High-performance, token-efficient AI context injection."
+  actions={[
+    { text: 'Get Started', link: '/skill-bridge/getting-started/', icon: 'right-arrow', variant: 'primary' },
+    { text: 'CLI Reference', link: '/skill-bridge/reference/cli/', icon: 'document' }
+  ]}
+/>
+
+<div class="mx-auto max-w-7xl px-6 lg:px-8 pb-24">
+  <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <ModernCard title="Token Efficient" icon="pencil">
+      Reduce prompt size by up to 75% via semantic fragment injection.
+    </ModernCard>
+    <ModernCard title="Sub-second RAG" icon="magnifier">
+      Local context retrieval in milliseconds using QMD.
+    </ModernCard>
+    <ModernCard title="Zero Latency" icon="rocket">
+      Lightning-fast logic engine built on `jq`.
+    </ModernCard>
+    <ModernCard title="CLI Native" icon="setting">
+      Works with Google Antigravity, Cursor, Claude Code, and Gemini CLI.
+    </ModernCard>
+  </div>
+</div>

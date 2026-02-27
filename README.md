@@ -93,11 +93,13 @@ In your AI-enabled IDE (Cursor, VS Code with Google Antigravity, etc.), you can 
 - [ ] Populate `data/migrations/` with standardized JSON transformation maps.
 - [ ] Implement `sb upgrade` for seamless version management.
 
+See the full [Roadmap](https://rubiconetic.github.io/skill-bridge/roadmap/) for more details.
+
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://rubiconetic.github.io/skill-bridge/contributing/) for details on our code of conduct and the process for submitting pull requests.
 
 ---
 
@@ -122,8 +124,8 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 Skill Bridge is powered by and draws inspiration from:
 
 - **[Antigravity Kit](https://github.com/vudovn/antigravity-kit)**: The foundational logic for agentic IDE integration.
-- **JQ**: The incredible JSON processor that makes our "Thin Pipe" possible.
-- **QMD**: For lightning-fast local Markdown RAG.
+- **[JQ](https://github.com/jqlang/jq)**: The incredible JSON processor that makes our "Thin Pipe" possible.
+- **[QMD](https://github.com/tobi/qmd)**: For lightning-fast local Markdown RAG.
 
 ---
 

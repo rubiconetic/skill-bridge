@@ -26,6 +26,8 @@ export default defineConfig({
 					label: 'Reference',
 					items: [
 						{ label: 'CLI Reference', slug: 'reference/cli' },
+						{ label: 'Roadmap', slug: 'roadmap' },
+						{ label: 'Contributing', slug: 'contributing' },
 					],
 				},
 			],

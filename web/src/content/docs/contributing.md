@@ -1,3 +1,8 @@
+---
+title: Contributing
+description: Guidelines for contributing to the Skill Bridge project.
+---
+
 # Contributing to Skill Bridge
 
 First off, thank you for considering contributing to Skill Bridge! It's people like you that make Skill Bridge such a great tool for everyone.

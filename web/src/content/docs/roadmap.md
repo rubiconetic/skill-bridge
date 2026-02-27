@@ -1,3 +1,8 @@
+---
+title: Roadmap
+description: Planned features and trajectory for Skill Bridge development.
+---
+
 # Skill Bridge Roadmap
 
 This document outlines the planned trajectory for Skill Bridge development.

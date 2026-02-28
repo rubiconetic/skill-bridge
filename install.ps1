@@ -3,10 +3,14 @@
 
 $ErrorActionPreference = "Stop"
 
+# Enforce TLS 1.2 for GitHub downloads (Fixes "connection was closed unexpectedly" in older PowerShell)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $REPO_URL = "https://github.com/rubiconetic/skill-bridge.git"
 $INSTALL_BASE = "$HOME\.skill-bridge"
 $BIN_DIR = "$INSTALL_BASE\bin"
 $VERSION = "0.1.0"
+
 
 function Write-Info($msg) { Write-Host "[install] $msg" -ForegroundColor Green }
 function Write-Warn($msg) { Write-Host "[install] $msg" -ForegroundColor Yellow }
@@ -14,11 +18,11 @@ function Write-Error-Custom($msg) { Write-Host "[install] $msg" -ForegroundColor
 
 # Header
 Write-Host @"
-  ____  _will _ _  ____       _     _            
- / ___|| | _(_) ||  _ \ _ __(_) __| | __ _  ___ 
- \___ \| |/ / | || |_) | '__| |/ _\` |/ _\` |/ _ \
-  ___) |   <| | ||  _ <| |  | | (_| | (_| |  __/ 
- |____/|_|\_\_|_||_| \_\_|  |_|\__,_|\__, |\___| 
+  ____  _will _ _ _  ____       _     _            
+ / ___|| | _(_) | |  _ \ _ __(_) __| | __ _  ___ 
+ \___ \| |/ / | | | |_) | '__| |/ _\` |/ _\` |/ _ \
+  ___) |   <| | | |  _ <| |  | | (_| | (_| |  __/ 
+ |____/|_|\_\_|_|_|_|_|_/_|  |_|\__,_|\__, |\___| 
                                      |___/       
 "@ -ForegroundColor Green
 

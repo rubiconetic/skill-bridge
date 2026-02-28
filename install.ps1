@@ -49,16 +49,22 @@ if (!(Test-Path "$INSTALL_BASE\.git")) {
     git pull
 }
 
-# Download Helper
+# Download Helper (Uses BITS for robust downloading, falls back to WebClient)
 function Download-File($url, $dest) {
     Try {
-        # Some CDNs reject default PowerShell UserAgents or empty ones
-        Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -ErrorAction Stop
+        Write-Info "Downloading via BITS ($url)..."
+        Import-Module BitsTransfer -ErrorAction SilentlyContinue
+        Start-BitsTransfer -Source $url -Destination $dest -ErrorAction Stop
     } Catch {
-        Write-Warn "Invoke-WebRequest failed, falling back to WebClient..."
-        $client = New-Object System.Net.WebClient
-        $client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-        $client.DownloadFile($url, $dest)
+        Write-Warn "BITS transfer failed. Falling back to WebClient..."
+        try {
+            $client = New-Object System.Net.WebClient
+            $client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+            $client.DownloadFile($url, $dest)
+        } catch {
+            Write-Error-Custom "All download methods failed. Error: $_"
+            exit 1
+        }
     }
 }
 

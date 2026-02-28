@@ -49,6 +49,19 @@ if (!(Test-Path "$INSTALL_BASE\.git")) {
     git pull
 }
 
+# Download Helper
+function Download-File($url, $dest) {
+    Try {
+        # Some CDNs reject default PowerShell UserAgents or empty ones
+        Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -ErrorAction Stop
+    } Catch {
+        Write-Warn "Invoke-WebRequest failed, falling back to WebClient..."
+        $client = New-Object System.Net.WebClient
+        $client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        $client.DownloadFile($url, $dest)
+    }
+}
+
 # 3. Dependencies: jq & qmd
 if (!(Test-Path $BIN_DIR)) { New-Item -ItemType Directory -Path $BIN_DIR | Out-Null }
 
@@ -56,14 +69,14 @@ if (!(Test-Path $BIN_DIR)) { New-Item -ItemType Directory -Path $BIN_DIR | Out-N
 if (!(Get-Command jq -ErrorAction SilentlyContinue)) {
     Write-Info "Downloading jq..."
     $jqUrl = "https://github.com/jqlang/jq/releases/latest/download/jq-win64.exe"
-    Invoke-WebRequest -Uri $jqUrl -OutFile "$BIN_DIR\jq.exe"
+    Download-File $jqUrl "$BIN_DIR\jq.exe"
 }
 
 # qmd
 if (!(Get-Command qmd -ErrorAction SilentlyContinue)) {
     Write-Info "Downloading qmd..."
     $qmdUrl = "https://github.com/tobias-walle/qmd/releases/latest/download/qmd-windows-x86_64.exe"
-    Invoke-WebRequest -Uri $qmdUrl -OutFile "$BIN_DIR\qmd.exe"
+    Download-File $qmdUrl "$BIN_DIR\qmd.exe"
 }
 
 # 4. Global Config

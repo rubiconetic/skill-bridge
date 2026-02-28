@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
-# install.sh — Skill Bridge global installer
-# Symlinks `sb` into /usr/local/bin (or ~/bin) and sets up ~/.skillbridge
+# install.sh — Skill Bridge universal installer
+# Supports: Linux, macOS (Intel/Silicon)
+# One-liner: curl -fsSL https://raw.githubusercontent.com/rubiconetic/skill-bridge/main/install.sh | bash
 
 set -euo pipefail
 
-SB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Constants
+REPO_URL="https://github.com/rubiconetic/skill-bridge.git"
+INSTALL_BASE="$HOME/.skill-bridge"
+BIN_DIR="$INSTALL_BASE/bin"
+SKILLS_DIR="$INSTALL_BASE/skills"
+VERSION="0.1.0"
 
+# Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -16,98 +23,140 @@ info()  { echo -e "${GREEN}[install]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[install]${NC} $1"; }
 error() { echo -e "${RED}[install]${NC} $1" >&2; }
 
-# Pick the best install dir on the user's PATH
-pick_install_dir() {
-    if [[ -d "$HOME/.local/bin" ]]; then
-        echo "$HOME/.local/bin"
-    elif [[ -d "$HOME/bin" ]]; then
-        echo "$HOME/bin"
-    elif [[ -w "/usr/local/bin" ]]; then
-        echo "/usr/local/bin"
-    else
-        # Create ~/.local/bin and add to PATH note
-        mkdir -p "$HOME/.local/bin"
-        echo "$HOME/.local/bin"
+# Dependency installation functions
+install_jq() {
+    if ! command -v jq &>/dev/null; then
+        info "Installing jq..."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if command -v apt-get &>/dev/null; then
+                sudo apt-get update && sudo apt-get install -y jq
+            elif command -v yum &>/dev/null; then
+                sudo yum install -y jq
+            else
+                warn "Unsupported Linux distro for auto-jq. Please install manually."
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            if command -v brew &>/dev/null; then
+                brew install jq
+            else
+                warn "Homebrew not found. Please install jq manually."
+            fi
+        fi
     fi
 }
 
-install_global_skills() {
-    local global_dir="$HOME/.skillbridge"
-    local skills_dest="$global_dir/skills"
-    local collection="sb-global"
+install_qmd() {
+    if ! command -v qmd &>/dev/null; then
+        info "Installing qmd..."
+        local arch
+        arch=$(uname -m)
+        local os="linux"
+        [[ "$OSTYPE" == "darwin"* ]] && os="macos"
+        
+        # Determine binary name based on OS/Arch
+        # This assumes a release naming pattern on GitHub
+        local release_url="https://github.com/tobias-walle/qmd/releases/latest/download/qmd-${os}-${arch}"
+        
+        mkdir -p "$BIN_DIR"
+        if curl -fsSL "$release_url" -o "$BIN_DIR/qmd"; then
+            chmod +x "$BIN_DIR/qmd"
+            info "qmd installed to $BIN_DIR"
+        else
+            error "Failed to download qmd. Please install it manually from https://github.com/tobias-walle/qmd"
+        fi
+    fi
+}
 
-    info "Saving skills globally to $skills_dest"
-    mkdir -p "$skills_dest"
-    cp -a "$SB_DIR/skills/"* "$skills_dest/" 2>/dev/null || true
-
-    info "Indexing global skills with QMD (collection: ${collection})"
-    if qmd collection list 2>/dev/null | grep -q "^${collection}"; then
-        warn "QMD collection '${collection}' already exists — re-indexing."
-        qmd collection remove "${collection}" 2>/dev/null || true
+# PATH management
+setup_path() {
+    local shell_config=""
+    if [[ "$SHELL" == *"zsh"* ]]; then
+        shell_config="$HOME/.zshrc"
+    elif [[ "$SHELL" == *"bash"* ]]; then
+        shell_config="$HOME/.bashrc"
+    else
+        shell_config="$HOME/.profile"
     fi
 
-    qmd collection add "${skills_dest}" \
-        --name "${collection}" \
-        --mask "**/*.md"
+    # Pick an install dir for the symlink that is on the PATH
+    local user_bin="$HOME/.local/bin"
+    if [[ -w "/usr/local/bin" ]]; then
+        user_bin="/usr/local/bin"
+    fi
+    mkdir -p "$user_bin"
+
+    if [[ ":$PATH:" != *":$user_bin:"* ]]; then
+        info "Adding $user_bin to PATH in $shell_config"
+        echo "export PATH=\"\$PATH:$user_bin\"" >> "$shell_config"
+        warn "Please restart your shell or run: source $shell_config"
+    fi
     
-    info "Running QMD embedding pass for global skills..."
-    qmd embed
-    info "Global skills indexed successfully ✔"
+    # Create symlink in the user_bin directory
+    ln -sf "$INSTALL_BASE/bin/sb" "$user_bin/sb"
+    info "Symlinked: $user_bin/sb -> $INSTALL_BASE/bin/sb"
+
+    # Also add current session path for immediate use
+    export PATH="$PATH:$user_bin"
 }
 
 main() {
-    echo ""
-    info "Installing Skill Bridge from: $SB_DIR"
+    echo -e "${GREEN}"
+    echo "  ____  _will _ _  ____       _     _            "
+    echo " / ___|| | _(_) ||  _ \ _ __(_) __| | __ _  ___ "
+    echo " \___ \| |/ / | || |_) | '__| |/ _\` |/ _\` |/ _ \\"
+    echo "  ___) |   <| | ||  _ <| |  | | (_| | (_| |  __/"
+    echo " |____/|_|\_\_|_||_| \_\_|  |_|\__,_|\__, |\___|"
+    echo "                                     |___/       "
+    echo -e "${NC}"
+    info "Starting Skill Bridge installation v${VERSION}..."
 
-    # Verify required binaries
-    for dep in jq qmd; do
-        if ! command -v "$dep" &>/dev/null; then
-            error "Required binary not found: $dep. Please install it first."
-            exit 1
+    # 1. Handle Bootstrap (Repo check)
+    if [[ ! -d "$INSTALL_BASE/.git" ]]; then
+        info "Cloning Skill Bridge to $INSTALL_BASE..."
+        if [[ -d "$INSTALL_BASE" ]]; then
+            warn "Destination $INSTALL_BASE exists but is not a git repo. Moving items..."
+            mv "$INSTALL_BASE" "${INSTALL_BASE}_old_$(date +%s)"
         fi
-    done
-
-    local install_dir
-    install_dir="$(pick_install_dir)"
-
-    # Symlink `sb`
-    local target="${install_dir}/sb"
-    if [[ -L "$target" ]]; then
-        warn "Removing existing symlink at $target"
-        rm "$target"
+        git clone "$REPO_URL" "$INSTALL_BASE"
+    else
+        info "Existing installation found at $INSTALL_BASE. Updating..."
+        cd "$INSTALL_BASE" && git pull
     fi
 
-    ln -s "${SB_DIR}/bin/sb" "$target"
-    chmod +x "${SB_DIR}/bin/sb"
-    info "Symlinked: $target → ${SB_DIR}/bin/sb"
+    # 2. Dependencies
+    install_jq
+    install_qmd
 
-    # Make all module scripts executable
-    find "${SB_DIR}/src" -name "*.sh" -exec chmod +x {} \;
-    info "Made all src/*.sh scripts executable"
+    # 3. Core Setup
+    chmod +x "$INSTALL_BASE/bin/sb"
+    find "$INSTALL_BASE/src" -name "*.sh" -exec chmod +x {} \;
 
-    # Set up ~/.skillbridge global config dir
-    local global_dir="$HOME/.skillbridge"
-    if [[ ! -d "$global_dir" ]]; then
-        mkdir -p "$global_dir/skills"
-        cat > "$global_dir/config.json" <<JSON
+    # 4. Global Config
+    local global_config="$HOME/.skillbridge"
+    mkdir -p "$global_config"
+    if [[ ! -f "$global_config/config.json" ]]; then
+        cat > "$global_config/config.json" <<JSON
 {
-  "version": "0.1.0",
+  "version": "${VERSION}",
   "default_ide": "antigravity",
   "context_max_tokens": 2000
 }
 JSON
-        info "Created global config: $global_dir/config.json"
-    else
-        warn "~/.skillbridge already exists — skipping global setup."
+        info "Created global config at $global_config/config.json"
     fi
 
-    install_global_skills
+    # 5. Global Skills Indexing
+    info "Initializing global skills..."
+    # Run from the install base to ensure dependencies are found
+    (cd "$INSTALL_BASE" && ./bin/sb skill index --global)
+
+    # 6. PATH & Symlinks
+    setup_path
 
     echo ""
-    info "✅ Skill Bridge installed. Run 'sb help' to get started."
-    if [[ "$install_dir" == "$HOME/.local/bin" || "$install_dir" == "$HOME/bin" ]]; then
-        warn "Ensure $install_dir is on your PATH."
-    fi
+    info "✅ Skill Bridge successfully installed!"
+    info "Run 'sb help' to get started."
+    echo ""
 }
 
 main "$@"

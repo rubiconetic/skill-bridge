@@ -1,0 +1,7 @@
+{
+  "version": "0.1.0",
+  "collection": "skill-bridge-skills",
+  "skills_path": "skills",
+  "ide": "antigravity",
+  "context_max_tokens": 2000
+}

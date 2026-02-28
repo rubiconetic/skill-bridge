@@ -1,5 +1,4 @@
-.agent/
-docs/
+# docs/
 !web/src/content/docs/
 
 # build output

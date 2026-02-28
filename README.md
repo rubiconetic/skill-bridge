@@ -39,10 +39,20 @@ graph TD
 
 ### Installation
 
-Run the global installer to symlink the `sb` command and set up your global skills:
+#### Linux & macOS
+
+Run the following one-liner to install Skill Bridge and its dependencies:
 
 ```bash
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/rubiconetic/skill-bridge/main/install.sh | bash
+```
+
+#### Windows
+
+Run the following in PowerShell (as Administrator for best results):
+
+```powershell
+powershell -c "irm https://raw.githubusercontent.com/rubiconetic/skill-bridge/main/install.ps1 | iex"
 ```
 
 ### Initialization

@@ -16,26 +16,37 @@ Usage: sb skill <command> [options]
 
 Commands:
   create <name>   Create a new skill folder and SKILL.md template
+  index           Re-index the current collection (local or global)
   help            Show this help
 
 Create Options:
   --index-now     Index the skill immediately (blocking)
   --index-bg      Index the skill in the background
   -y, --yes       Skip the indexing prompt (default: index now)
+
+Index Options:
+  --global        Index the global skills collection instead of local
 EOF
 }
 
 # Indexing helper (surgical re-indexing)
 index_skill() {
     local mode="${1:-now}" # now, bg
+    local is_global="${2:-false}"
 
     local collection
-    collection="$(sb_config_get "collection")"
     local skills_path
-    skills_path="$(sb_config_get "skills_path")"
+
+    if [[ "$is_global" == "true" ]]; then
+        collection="sb-global"
+        skills_path="$HOME/.skillbridge/skills"
+    else
+        collection="$(sb_config_get "collection")"
+        skills_path="$(sb_config_get "skills_path")"
+    fi
     
     if [[ -z "$collection" ]]; then
-        sb_error "No QMD collection found in config. Run 'sb init' first."
+        sb_error "No QMD collection found in config. Run 'sb init' first, or use --global."
         return 1
     fi
 
@@ -134,7 +145,7 @@ EOF
     if [[ "$mode" != "none" ]]; then
         index_skill "$mode"
     else
-        sb_warn "Skipped indexing. Remember to run 'sb init' or 'qmd update' later."
+        sb_warn "Skipped indexing. Remember to run 'sb skill index' later."
     fi
 }
 
@@ -148,6 +159,16 @@ shift
 case "$command" in
     create)
         create_skill "$@"
+        ;;
+    index)
+        is_global=false
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --global) is_global=true; shift ;;
+                *) shift ;;
+            esac
+        done
+        index_skill "now" "$is_global"
         ;;
     help|--help|-h)
         usage

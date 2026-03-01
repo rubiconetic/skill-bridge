@@ -33,7 +33,7 @@ check_binaries() {
     if [[ "$ok" == "false" ]]; then
         sb_error "Install missing binaries then re-run 'sb init'."
         sb_error "  jq:  https://jqlang.github.io/jq/download/"
-        sb_error "  qmd: https://github.com/tobias-walle/qmd"
+        sb_error "  qmd: bun install -g @tobilu/qmd  (or npm install -g @tobilu/qmd)"
         exit 1
     fi
 }

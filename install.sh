@@ -48,21 +48,15 @@ install_jq() {
 install_qmd() {
     if ! command -v qmd &>/dev/null; then
         info "Installing qmd..."
-        local arch
-        arch=$(uname -m)
-        local os="linux"
-        [[ "$OSTYPE" == "darwin"* ]] && os="macos"
-        
-        # Determine binary name based on OS/Arch
-        # This assumes a release naming pattern on GitHub
-        local release_url="https://github.com/tobias-walle/qmd/releases/latest/download/qmd-${os}-${arch}"
-        
-        mkdir -p "$BIN_DIR"
-        if curl -fsSL "$release_url" -o "$BIN_DIR/qmd"; then
-            chmod +x "$BIN_DIR/qmd"
-            info "qmd installed to $BIN_DIR"
+        if command -v bun &>/dev/null; then
+            info "Found bun! Installing via bun..."
+            bun install -g @tobilu/qmd
+        elif command -v npm &>/dev/null; then
+            info "Found npm. Installing via npm..."
+            npm install -g @tobilu/qmd
         else
-            error "Failed to download qmd. Please install it manually from https://github.com/tobias-walle/qmd"
+            error "Neither bun nor npm were found. Please install Bun (https://bun.sh) or Node.js (https://nodejs.org)."
+            exit 1
         fi
     fi
 }
@@ -101,12 +95,12 @@ setup_path() {
 
 main() {
     echo -e "${GREEN}"
-    echo "  ____  _will _ _  ____       _     _            "
-    echo " / ___|| | _(_) ||  _ \ _ __(_) __| | __ _  ___ "
-    echo " \___ \| |/ / | || |_) | '__| |/ _\` |/ _\` |/ _ \\"
-    echo "  ___) |   <| | ||  _ <| |  | | (_| | (_| |  __/"
-    echo " |____/|_|\_\_|_||_| \_\_|  |_|\__,_|\__, |\___|"
-    echo "                                     |___/       "
+    echo "   _____ __   _ ________       _     __         "
+    echo "  / ___// /__(_) / / __ )_____(_)___/ /___ ____ "
+    echo "  \__ \/ //_/ / / / __  / ___/ / __  / __ \`/ _ \\ "
+    echo " ___/ / ,< / / / / /_/ / /  / / /_/ / /_/ /  __/ "
+    echo "/____/_/|_/_/_/_/_____/_/  /_/\__,_/\__, /\___/ "
+    echo "                                   /____/ "
     echo -e "${NC}"
     info "Starting Skill Bridge installation v${VERSION}..."
 

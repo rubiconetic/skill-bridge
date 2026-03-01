@@ -18,12 +18,12 @@ function Write-Error-Custom($msg) { Write-Host "[install] $msg" -ForegroundColor
 
 # Header
 Write-Host @"
-  ____  _will _ _ _  ____       _     _            
- / ___|| | _(_) | |  _ \ _ __(_) __| | __ _  ___ 
- \___ \| |/ / | | | |_) | '__| |/ _\` |/ _\` |/ _ \
-  ___) |   <| | | |  _ <| |  | | (_| | (_| |  __/ 
- |____/|_|\_\_|_|_|_|_|_/_|  |_|\__,_|\__, |\___| 
-                                     |___/       
+   _____ __   _ ________       _     __         
+  / ___// /__(_) / / __ )_____(_)___/ /___ ____ 
+  \__ \/ //_/ / / / __  / ___/ / __  / __ `/ _ \
+ ___/ / ,< / / / / /_/ / /  / / /_/ / /_/ /  __/
+/____/_/|_/_/_/_/_____/_/  /_/\__,_/\__, /\___/ 
+                                   /____/      
 "@ -ForegroundColor Green
 
 Write-Info "Starting Skill Bridge installation v$VERSION..."
@@ -80,9 +80,17 @@ if (!(Get-Command jq -ErrorAction SilentlyContinue)) {
 
 # qmd
 if (!(Get-Command qmd -ErrorAction SilentlyContinue)) {
-    Write-Info "Downloading qmd..."
-    $qmdUrl = "https://github.com/tobias-walle/qmd/releases/latest/download/qmd-windows-x86_64.exe"
-    Download-File $qmdUrl "$BIN_DIR\qmd.exe"
+    Write-Info "Installing qmd..."
+    if (Get-Command bun -ErrorAction SilentlyContinue) {
+        Write-Info "Found bun! Installing via bun..."
+        bun install -g @tobilu/qmd
+    } elseif (Get-Command npm -ErrorAction SilentlyContinue) {
+        Write-Info "Found npm. Installing via npm..."
+        npm install -g @tobilu/qmd
+    } else {
+        Write-Error-Custom "Neither bun nor npm were found. Please install Bun (https://bun.sh) or Node.js (https://nodejs.org) and run this script again."
+        exit 1
+    }
 }
 
 # 4. Global Config

@@ -111,7 +111,8 @@ foreach ($p in $candidatePaths) {
     if (Test-Path $p) { $bashExe = $p; break }
 }
 if (!$bashExe) {
-    $bashExe = (Get-Command bash -ErrorAction SilentlyContinue)?.Source
+    $bashCmd = Get-Command bash -ErrorAction SilentlyContinue
+    if ($bashCmd) { $bashExe = $bashCmd.Source }
 }
 if (!$bashExe) {
     Write-Warn "bash not found. 'sb' will not work until Git for Windows is installed."

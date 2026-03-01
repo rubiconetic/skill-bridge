@@ -9,6 +9,9 @@ $ErrorActionPreference = "Stop"
 $REPO_URL = "https://github.com/rubiconetic/skill-bridge.git"
 $INSTALL_BASE = "$HOME\.skill-bridge"
 $BIN_DIR = "$INSTALL_BASE\bin"
+# SHIM_DIR is a clean Windows-only directory (no extensionless bash scripts)
+# to avoid PowerShell file-association conflicts
+$SHIM_DIR = "$HOME\.skillbridge\bin"
 $VERSION = "0.1.0"
 
 
@@ -69,13 +72,13 @@ function Download-File($url, $dest) {
 }
 
 # 3. Dependencies: jq & qmd
-if (!(Test-Path $BIN_DIR)) { New-Item -ItemType Directory -Path $BIN_DIR | Out-Null }
+if (!(Test-Path $SHIM_DIR)) { New-Item -ItemType Directory -Path $SHIM_DIR | Out-Null }
 
 # jq
 if (!(Get-Command jq -ErrorAction SilentlyContinue)) {
     Write-Info "Downloading jq..."
     $jqUrl = "https://github.com/jqlang/jq/releases/latest/download/jq-win64.exe"
-    Download-File $jqUrl "$BIN_DIR\jq.exe"
+    Download-File $jqUrl "$SHIM_DIR\jq.exe"
 }
 
 # qmd
@@ -93,9 +96,8 @@ if (!(Get-Command qmd -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Create sb.cmd wrapper so cmd/PowerShell can invoke the bash script
-# .cmd takes precedence over extensionless files in Windows PATH resolution
-$sbWrapper = "$BIN_DIR\sb.cmd"
+# Create sb.cmd wrapper in the clean SHIM_DIR (separate from extensionless bash scripts)
+$sbWrapper = "$SHIM_DIR\sb.cmd"
 $sbScript  = "$INSTALL_BASE\bin\sb"
 Write-Info "Creating sb.cmd wrapper at $sbWrapper..."
 
@@ -138,14 +140,20 @@ if (!(Test-Path $configFile)) {
     Write-Info "Created global config at $configFile"
 }
 
-# 5. PATH Setup
+# 5. PATH Setup — add SHIM_DIR (clean Windows dir) and bun bin
 $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
 $newPath = $currentPath
 
-# Add sb bin dir
-if ($currentPath -notlike "*$BIN_DIR*") {
-    Write-Info "Adding $BIN_DIR to User PATH..."
-    $newPath = "$newPath;$BIN_DIR"
+# Remove old BIN_DIR from PATH if present (it contains the extensionless sb file)
+if ($newPath -like "*$BIN_DIR*") {
+    Write-Info "Removing old $BIN_DIR from PATH (replaced by $SHIM_DIR)..."
+    $newPath = ($newPath -split ';' | Where-Object { $_ -ne $BIN_DIR }) -join ';'
+}
+
+# Add shim dir (contains sb.cmd + jq.exe)
+if ($newPath -notlike "*$SHIM_DIR*") {
+    Write-Info "Adding $SHIM_DIR to User PATH..."
+    $newPath = "$newPath;$SHIM_DIR"
 }
 
 # Add bun global bin so qmd is available after restart
